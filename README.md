@@ -1,2 +1,2 @@
-# zenhome
-ZenHome - smart home automation app
+# ZenHome
+Smart home automation app
