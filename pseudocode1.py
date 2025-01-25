@@ -1,10 +1,10 @@
 import json
 
-# generic names Main
+# generic names for classes/methods/vars
 # one class for all code
 # same code (ie: values validation) repeated in multiple places
 # nested if statements
-# no hashing of password - kept in clear
+# no password hashing - kept in clear
 # no password expiry
 # no different authorisation levels
 # no error handling
@@ -13,9 +13,9 @@ class Main:
     '''
     payload param is expected to be json {
         "action": "create/login/forget/update/delete", - mandatory
-        "email": "", - mandatory 
-        "password": "", - mandatory for create, login, update, delete
-        "newPassword": "", - mandatory for update
+        "email": "xx@yy.z", - mandatory 
+        "password": "1234", - mandatory for create, login, update, delete
+        "newPassword": "5678", - mandatory for update
     }
     '''
     def __init__(self, payload):
