@@ -9,7 +9,7 @@ const deviceBlock = document.getElementById('device-block');
 const device = document.getElementById('device');
 const submit = document.getElementById('submit');
 
-export const setBtnClick = () => {
+export const setEvents = () => {
     document.getElementById('btn-login').addEventListener('click', () => formFields('login'));
     document.getElementById('btn-create').addEventListener('click', () => formFields('create'));
     document.getElementById('btn-update').addEventListener('click', () => formFields('update'));
@@ -57,7 +57,6 @@ export const validationUI = (input, block, valid, msg) => {
     if (valid) {
         input.className = `${input.className.replace('is-invalid', '')} is-valid`;
         const errorNode = block.getElementsByClassName('invalid-feedback')[0];
-        console.log(!!errorNode)
         errorNode && block.removeChild(errorNode);
     } else if (!valid && block.getElementsByClassName('invalid-feedback').length === 0) {
         const error = document.createElement('div');
@@ -91,9 +90,7 @@ export const checkFields = () => {
     const pwdValid = pwd.className.includes('is-valid') || pwdBlock.className.includes('d-none');
     const newPwdValid = newPwd.className.includes('is-valid') || newPwdBlock.className.includes('d-none');
     const deviceValid = device.className.includes('is-valid') || deviceBlock.className.includes('d-none');
-    console.log('>>>>>>', emailValid, pwdValid, newPwdValid, deviceValid)
     if (emailValid && pwdValid && newPwdValid && deviceValid) {
-        console.log('>>>>>>inn')
         form.className = 'd-none';
         document.getElementById('buttons').className = 'd-none';
         document.getElementById('submitted-msg').className = '';
@@ -105,4 +102,4 @@ export const checkFields = () => {
     }
 };
 
-window.addEventListener('load', setBtnClick);
+window.addEventListener('load', setEvents);
