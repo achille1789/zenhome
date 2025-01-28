@@ -54,16 +54,18 @@ export const formFields = (btn) => {
 };
 
 export const validationUI = (input, block, valid, msg) => {
+    const errorNode = block.getElementsByClassName('invalid-feedback')[0];
     if (valid) {
         input.className = `${input.className.replace('is-invalid', '')} is-valid`;
-        const errorNode = block.getElementsByClassName('invalid-feedback')[0];
         errorNode && block.removeChild(errorNode);
-    } else if (!valid && block.getElementsByClassName('invalid-feedback').length === 0) {
+    } else if (!valid && !errorNode) {
         const error = document.createElement('div');
         error.className = 'invalid-feedback';
         error.textContent = msg;
         block.appendChild(error);
         input.className = `${input.className} is-invalid`;
+    } else if (!valid && errorNode.textContent === 'Field is required') {
+        errorNode.textContent = msg;
     }
 };
 
