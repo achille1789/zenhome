@@ -104,4 +104,4 @@ export const checkFields = () => {
     }
 };
 
-window.addEventListener('load', setEvents);
+// window.addEventListener('load', setEvents);
