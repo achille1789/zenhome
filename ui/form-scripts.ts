@@ -11,6 +11,7 @@ export class FormValidation {
     private _deviceBlock: HTMLElement = document.getElementById('device-block')!;
     private _device: HTMLInputElement = document.getElementById('device') as HTMLInputElement;
     private _submit: HTMLElement = document.getElementById('submit')!;
+    
     constructor() {
         document.getElementById('btn-login')!.addEventListener('click', (): void => this.formFields('login'));
         document.getElementById('btn-create')!.addEventListener('click', (): void => this.formFields('create'));
