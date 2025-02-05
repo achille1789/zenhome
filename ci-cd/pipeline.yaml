@@ -1,0 +1,135 @@
+resource_types:
+  - name: github-pr
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+resources:
+  - name: repo-pr-open
+    icon: github
+    type: github-pr
+    check_every: never
+    source:
+      base_branch: main
+      states:
+        - OPEN
+      repository: achille1789/zenhome
+      access_token: ((github-token))
+      ignore_drafts: true
+  - name: repo-pr-merged
+    icon: github
+    type: github-pr
+    check_every: never
+    source:
+      base_branch: main
+      states:
+        - MERGED
+        - OPEN # TODO: remove this line
+      repository: achille1789/zenhome
+      access_token: ((github-token))
+
+jobs:
+  - name: pr-open-checks
+    plan:
+      - get: repo-pr-open
+        trigger: true
+        
+      - task: unit-tests
+        config:
+          platform: linux
+          inputs:
+            - name: repo-pr-open
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd repo-pr-open
+                echo "Installing dependencies..."
+                npm install
+                echo "Running unit tests..."
+                npm run test
+
+  - name: upload-to-stage-environment
+    plan:
+      - get: repo-pr-open
+        passed:
+          - pr-open-checks
+      - get: repo-pr-merged
+        trigger: true
+
+      - task: build-code
+        config:
+          platform: linux
+          inputs:
+            - name: repo-pr-merged
+          outputs:
+            - name: repo-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd repo-pr-merged
+                echo "Installing dependencies..."
+                npm install
+                echo "Building code..."
+                npm run build
+                
+      - task: upload-to-stage
+        config:
+          platform: linux
+          inputs:
+            - name: repo-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/library/ubuntu
+              tag: latest
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd repo-pr-merged/ui
+                echo "Listing built files..."
+                ls
+                echo "Uploading to stage..."
+                echo "Files uploaded to stage successfully!"
+                
+  - name: upload-to-prod-environment
+    plan:
+      - get: repo-pr-merged
+#        trigger: true
+        passed:
+          - upload-to-stage-environment
+                
+      - task: upload-to-prod
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/library/ubuntu
+              tag: latest
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                echo "Uploading to stage..."
+                echo "Files uploaded to prod successfully!"
