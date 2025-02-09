@@ -1,1 +1,7 @@
 PyJWT==2.10.1
+fastapi==0.115.4
+pydantic==2.9.2
+requests==2.32.3
+uvicorn==0.32.0
+bcrypt==4.2.1
+SQLAlchemy==2.0.38
