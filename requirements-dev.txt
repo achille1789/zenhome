@@ -2,5 +2,4 @@
 
 behave==1.2.6
 coverage==7.6.11
-PyJWT==2.10.1
 pytest==7.4.3
