@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  ZenHome - AWS resources
+
+Parameters:
+  Env:
+    Description: The environment where to deploy
+    Type: String
+    AllowedValues: [stage, prod]
+
+Resources:
+  # S3 bucket for the UI
+  ZenHomeUIBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${Env}-zenhome-portal'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+  # Public access policy for the bucket
+  ZenHomeUIBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ZenHomeUIBucket
+      PolicyDocument:
+        'Version': '2008-10-17'
+        'Statement':
+          - 'Effect': 'Allow'
+            'Principal': "*"
+            'Action': 's3:GetObject'
+            'Resource': !Sub 'arn:aws:s3:::${Env}-zenhome-portal/*'
