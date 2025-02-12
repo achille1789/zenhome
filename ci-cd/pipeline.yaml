@@ -1,0 +1,282 @@
+resource_types:
+  - name: github-pr
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+resources:
+  - name: repo-pr-open
+    icon: github
+    type: github-pr
+    check_every: never
+    source:
+      base_branch: main
+      states:
+        - OPEN
+      repository: achille1789/zenhome
+      access_token: ((github-token))
+      ignore_drafts: true
+  - name: ui-pr-merged
+    icon: github
+    type: github-pr
+    check_every: never
+    source:
+      base_branch: main
+      states:
+        - MERGED
+        - OPEN # TODO: remove this line
+      repository: achille1789/zenhome
+      access_token: ((github-token))
+      paths:
+        - ui/*
+  - name: backend-pr-merged
+    icon: github
+    type: github-pr
+    check_every: never
+    source:
+      base_branch: main
+      states:
+        - MERGED
+        - OPEN # TODO: remove this line
+      repository: achille1789/zenhome
+      access_token: ((github-token))
+      paths:
+        - "*.py"
+
+jobs:
+  - name: pr-open-checks
+    plan:
+      - get: repo-pr-open
+        trigger: true
+        
+      - task: unit-tests
+        config:
+          platform: linux
+          inputs:
+            - name: repo-pr-open
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd repo-pr-open
+                echo "Installing dependencies..."
+                npm install
+                echo "Running unit tests..."
+                npm run test
+
+  - name: deploy-ui-to-stage
+    plan:
+      - get: repo-pr-open
+        passed:
+          - pr-open-checks
+      - get: ui-pr-merged
+        trigger: true
+
+      - task: build-ui-code
+        config:
+          platform: linux
+          inputs:
+            - name: ui-pr-merged
+          outputs:
+            - name: ui-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd ui-pr-merged
+                echo "Installing dependencies..."
+                npm install
+                echo "Building code..."
+                npm run build
+                
+      - task: upload-to-stage
+        config:
+          platform: linux
+          inputs:
+            - name: ui-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: public.ecr.aws/sam/build-nodejs20.x
+              tag: latest
+          params:
+            AWS_ACCESS_KEY_ID: ((aws-user-access-key-id))
+            AWS_SECRET_ACCESS_KEY: ((aws-user-secret-access-key))
+            AWS_DEFAULT_REGION: eu-west-2
+            ENVIRONMENT: stage
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd ui-pr-merged
+                ls
+                echo "Listing built files..."
+                ls ui
+                echo "Building S3 bucket..."
+                aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
+                echo "Uploading file to S3 bucket on stage environment..."
+                aws s3 cp ui s3://$ENVIRONMENT-zenhome-portal --recursive
+                echo "Files uploaded to stage successfully!"
+                
+  - name: deploy-ui-to-prod
+    plan:
+      - get: ui-pr-merged
+#        trigger: true
+        passed:
+          - deploy-ui-to-stage
+
+      - task: build-ui-code
+        config:
+          platform: linux
+          inputs:
+            - name: ui-pr-merged
+          outputs:
+            - name: ui-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd ui-pr-merged
+                echo "Installing dependencies..."
+                npm install
+                echo "Building code..."
+                npm run build
+                
+      - task: deploy-ui-to-prod
+        config:
+          platform: linux
+          inputs:
+            - name: ui-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: public.ecr.aws/sam/build-nodejs20.x
+              tag: latest
+          params:
+            AWS_ACCESS_KEY_ID: ((aws-user-access-key-id))
+            AWS_SECRET_ACCESS_KEY: ((aws-user-secret-access-key))
+            AWS_DEFAULT_REGION: eu-west-2
+            ENVIRONMENT: prod
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd ui-pr-merged
+                ls
+                echo "Listing built files..."
+                ls ui
+                echo "Building S3 bucket..."
+                aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
+                echo "Uploading file to S3 bucket on stage environment..."
+                aws s3 cp ui s3://$ENVIRONMENT-zenhome-portal --recursive
+                echo "Files uploaded to stage successfully!"
+  
+  - name: deploy-backend-to-stage
+    plan:
+      - get: repo-pr-open
+        passed:
+          - pr-open-checks
+      - get: backend-pr-merged
+        trigger: true
+
+      - task: build-ui-code
+        config:
+          platform: linux
+          inputs:
+            - name: backend-pr-merged
+          outputs:
+            - name: backend-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: registry.cloud.sky/docker-hub/nikolaik/python-nodejs
+              tag: python3.9-nodejs20
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd backend-pr-merged
+                echo "Installing dependencies..."
+                npm install
+                echo "Building code..."
+                npm run build
+
+      - task: upload-to-stage
+        config:
+          platform: linux
+          inputs:
+            - name: backend-pr-merged
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: public.ecr.aws/sam/build-nodejs20.x
+              tag: latest
+          params:
+            AWS_ACCESS_KEY_ID: ((aws-user-access-key-id))
+            AWS_SECRET_ACCESS_KEY: ((aws-user-secret-access-key))
+            AWS_DEFAULT_REGION: eu-west-2
+            ENVIRONMENT: stage
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd backend-pr-merged
+                echo "Listing built files..."
+                ls
+
+  - name: deploy-backend-to-prod
+    plan:
+      - get: backend-pr-merged
+        #        trigger: true
+        passed:
+          - deploy-backend-to-stage
+
+      - task: deploy-backend-to-prod
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            icon: docker
+            source:
+              repository: public.ecr.aws/sam/build-nodejs20.x
+              tag: latest
+          params:
+            AWS_ACCESS_KEY_ID: ((aws-user-access-key-id))
+            AWS_SECRET_ACCESS_KEY: ((aws-user-secret-access-key))
+            ENVIRONMENT: prod
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                echo "Uploading to stage..."
+                echo "Files uploaded to prod successfully!"
