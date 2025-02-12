@@ -24,7 +24,6 @@ resources:
       base_branch: main
       states:
         - MERGED
-        - OPEN # TODO: remove this line
       repository: achille1789/zenhome
       access_token: ((github-token))
       paths:
@@ -37,7 +36,6 @@ resources:
       base_branch: main
       states:
         - MERGED
-        - OPEN # TODO: remove this line
       repository: achille1789/zenhome
       access_token: ((github-token))
       paths:
