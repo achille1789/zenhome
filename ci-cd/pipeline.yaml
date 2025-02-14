@@ -16,7 +16,7 @@ resources:
       repository: achille1789/zenhome
       access_token: ((github-token))
       ignore_drafts: true
-  - name: ui-pr-merged
+  - name: frontend-pr-merged
     icon: github
     type: github-pr
     check_every: never
@@ -27,7 +27,7 @@ resources:
       repository: achille1789/zenhome
       access_token: ((github-token))
       paths:
-        - ui/*
+        - frontend/*
   - name: backend-pr-merged
     icon: github
     type: github-pr
@@ -39,7 +39,7 @@ resources:
       repository: achille1789/zenhome
       access_token: ((github-token))
       paths:
-        - "*.py"
+        - backend/*
 
 jobs:
   - name: pr-open-checks
@@ -69,21 +69,21 @@ jobs:
                 echo "Running unit tests..."
                 npm run test
 
-  - name: deploy-ui-to-stage
+  - name: deploy-frontend-to-stage
     plan:
       - get: repo-pr-open
         passed:
           - pr-open-checks
-      - get: ui-pr-merged
+      - get: frontend-pr-merged
         trigger: true
 
-      - task: build-ui-code
+      - task: build-frontend-code
         config:
           platform: linux
           inputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           outputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           image_resource:
             type: registry-image
             icon: docker
@@ -95,7 +95,7 @@ jobs:
             args:
               - -c
               - |
-                cd ui-pr-merged
+                cd frontend-pr-merged
                 echo "Installing dependencies..."
                 npm install
                 echo "Building code..."
@@ -105,7 +105,7 @@ jobs:
         config:
           platform: linux
           inputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           image_resource:
             type: registry-image
             icon: docker
@@ -122,30 +122,30 @@ jobs:
             args:
               - -c
               - |
-                cd ui-pr-merged
+                cd frontend-pr-merged
                 ls
                 echo "Listing built files..."
-                ls ui
+                ls frontend/src
                 echo "Building S3 bucket..."
                 aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
                 echo "Uploading file to S3 bucket on stage environment..."
-                aws s3 cp ui s3://$ENVIRONMENT-zenhome-portal --recursive
+                aws s3 cp frontend/src s3://$ENVIRONMENT-zenhome-portal --recursive
                 echo "Files uploaded to stage successfully!"
                 
-  - name: deploy-ui-to-prod
+  - name: deploy-frontend-to-prod
     plan:
-      - get: ui-pr-merged
+      - get: frontend-pr-merged
 #        trigger: true
         passed:
-          - deploy-ui-to-stage
+          - deploy-frontend-to-stage
 
-      - task: build-ui-code
+      - task: build-frontend-code
         config:
           platform: linux
           inputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           outputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           image_resource:
             type: registry-image
             icon: docker
@@ -157,17 +157,17 @@ jobs:
             args:
               - -c
               - |
-                cd ui-pr-merged
+                cd frontend-pr-merged
                 echo "Installing dependencies..."
                 npm install
                 echo "Building code..."
                 npm run build
                 
-      - task: deploy-ui-to-prod
+      - task: deploy-frontend-to-prod
         config:
           platform: linux
           inputs:
-            - name: ui-pr-merged
+            - name: frontend-pr-merged
           image_resource:
             type: registry-image
             icon: docker
@@ -184,14 +184,14 @@ jobs:
             args:
               - -c
               - |
-                cd ui-pr-merged
+                cd frontend-pr-merged
                 ls
                 echo "Listing built files..."
-                ls ui
+                ls frontend/src
                 echo "Building S3 bucket..."
                 aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
                 echo "Uploading file to S3 bucket on stage environment..."
-                aws s3 cp ui s3://$ENVIRONMENT-zenhome-portal --recursive
+                aws s3 cp frontend/src s3://$ENVIRONMENT-zenhome-portal --recursive
                 echo "Files uploaded to stage successfully!"
   
   - name: deploy-backend-to-stage
@@ -202,7 +202,7 @@ jobs:
       - get: backend-pr-merged
         trigger: true
 
-      - task: build-ui-code
+      - task: build-frontend-code
         config:
           platform: linux
           inputs:
