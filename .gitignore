@@ -4,3 +4,5 @@ venv
 node_modules
 
 *.js
+.coverage
+__pycache__

@@ -192,7 +192,7 @@ jobs:
                 aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
                 echo "Uploading file to S3 bucket on stage environment..."
                 aws s3 cp frontend/src s3://$ENVIRONMENT-zenhome-portal --recursive
-                echo "Files uploaded to stage successfully!"
+                echo "Files uploaded to production successfully!"
   
   - name: deploy-backend-to-stage
     plan:
@@ -221,10 +221,12 @@ jobs:
               - -c
               - |
                 cd backend-pr-merged
-                echo "Installing dependencies..."
-                npm install
-                echo "Building code..."
-                npm run build
+                ls
+                echo "Building S3 bucket..."
+                aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
+                echo "Uploading file to S3 bucket on stage environment..."
+                aws s3 cp backend s3://$ENVIRONMENT-zenhome-portal/backend --recursive
+                echo "Files uploaded to stage successfully!"
 
       - task: upload-to-stage
         config:
@@ -275,6 +277,12 @@ jobs:
             path: /bin/sh
             args:
               - -c
-              - |
-                echo "Uploading to stage..."
-                echo "Files uploaded to prod successfully!"
+              - cd backend-pr-merged
+                ls
+                echo "Listing built files..."
+                ls backend
+                echo "Building S3 bucket..."
+                aws cloudformation deploy --template-file iac/template.yaml --stack-name $ENVIRONMENT-zenhome-stack --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$ENVIRONMENT
+                echo "Uploading file to S3 bucket on stage environment..."
+                aws s3 cp backend s3://$ENVIRONMENT-zenhome-portal/backend --recursive
+                echo "Files uploaded to production successfully!"

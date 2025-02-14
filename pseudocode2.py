@@ -12,7 +12,7 @@ import os
 # class for Authentication Service
 class AuthenticationService:
     # same payload as pseudocode1.py but action "forget" is replaced by "reset" and "deviceId" is added to allow for different authorisation levels
-    
+
     '''
     payload param is expected to be json {
         "action": "create/login/reset/update/delete", - mandatory
@@ -31,7 +31,7 @@ class AuthenticationService:
         self.password = data['password']
         self.new_password = data['newPassword']
         self.device_id = data['deviceId']
-        
+
     # private method to validate email
     def _validate_email(self, email):
         # code to validate email using regex
@@ -49,7 +49,7 @@ class AuthenticationService:
         # code to validate pwd using regex
         # return boolean
         pass
-     
+
     def perform_action(self):
         if self.action == 'create':
             if not self._validate_email(self.email): return "Invalid email"
@@ -76,7 +76,7 @@ class AuthenticationService:
             if not self._validate_email(self.email): return "Invalid email"
             if not self._validate_password(self.password): return "Invalid password"
             return UserManager().delete_user(self.email, self.password)
-        
+
         # handle invalid action
         return "Invalid action"
 
@@ -129,13 +129,13 @@ class UserManager:
         #   return success message
         # return error message
         pass
-    
+
 # class for Token Generator
 class TokenGenerator:
     def __init__(self, auth_level):
         # self.token = code to generate a token based on auth_level
         pass
-    
+
     def get_token(self):
         # return self.token
         pass
