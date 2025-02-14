@@ -6,6 +6,10 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.Iterator;
+import java.util.Map;
+
 public class CreateUserSimulation extends Simulation {
 
     // Add the HttpProtocolBuilder:
@@ -13,14 +17,16 @@ public class CreateUserSimulation extends Simulation {
                                             .acceptHeader("application/json");
 
     // This will generate a random email for each request as email must be unique
-    FeederBuilder<Object> feeder = IteratorFeederBuilder.of(() -> {
-        String email = "user" + ThreadLocalRandom.current().nextInt(1000, 10000) + "@gmail.com";
-        String password = "someValidPassword";
-        return Map.of("email", email, "password");
-    });
+//    FeederBuilder<Object> feeder = Iterator.continually(Map.of("email", "user" + ThreadLocalRandom.current().nextInt(1000, 10000) + "@gmail.com", "password", "someValidPassword"));
+//    FeederBuilder<Object> feeder = IteratorFeederBuilder.of(() -> {
+//        String email = "user" + ThreadLocalRandom.current().nextInt(1000, 10000) + "@gmail.com";
+//        String password = "someValidPassword";
+//        return Map.of("email", email, "password");
+//    });
 
     ScenarioBuilder myFirstScenario = scenario("Create User Scenario")
             .exec(http("Create User")
+                    .feed(IteratorFeederBuilder.continually(Map.of("email", "user" + ThreadLocalRandom.current().nextInt(1000, 10000) + "@gmail.com", "password", "someValidPassword")))
                     .post("/v1/create")
                     .body(StringBody("{\"email\": \"${email}\", \"password\": \"${password}\"}")).asJson());
 
