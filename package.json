@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "ZenHome - Smart home automation app",
   "scripts": {
-    "test": "echo \"Error: no test yet\""
+    "build": "tsc",
+    "test": "vitest run --coverage --coverage.reporter=text"
   },
   "repository": {
     "type": "git",
@@ -14,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/achille1789/zenhome/issues"
   },
-  "homepage": "https://github.com/achille1789/zenhome#readme"
+  "homepage": "https://github.com/achille1789/zenhome#readme",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.4",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.4"
+  }
 }

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "lib": ["ES6", "DOM"],
+    "module": "ES2022",
+    "moduleResolution": "node"
+  },
+  "include": ["frontend/src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
