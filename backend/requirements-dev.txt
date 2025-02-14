@@ -1,0 +1,5 @@
+-r requirements.txt
+
+behave==1.2.6
+coverage==7.6.11
+pytest==7.4.3
