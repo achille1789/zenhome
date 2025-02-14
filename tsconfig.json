@@ -8,6 +8,6 @@
     "module": "ES2022",
     "moduleResolution": "node"
   },
-  "include": ["ui/**/*"],
+  "include": ["frontend/src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

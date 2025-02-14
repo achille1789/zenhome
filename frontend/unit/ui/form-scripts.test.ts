@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
-import { FormValidation } from '../../ui/form-scripts';
+import { FormValidation } from '../../src/login-validation';
 
 describe('Form Scripts tests', () => {
     const btnLogin= document.createElement('button');
