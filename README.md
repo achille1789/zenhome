@@ -42,3 +42,17 @@ coverage report -m
 First, start the app.
 
 Then either run the feature file directly, or right-click on the behave folder and click run.
+
+### NFT Gatling Tests
+
+We are using Gatling to perform load tests. To run Gatling, first ensure you have maven installed. To install Maven, run:
+
+```bash
+brew install maven
+```
+
+Once Maven is installed, change directory to the nft-gatling folder and run the tests
+
+```bash
+./mvnw gatling:test
+```

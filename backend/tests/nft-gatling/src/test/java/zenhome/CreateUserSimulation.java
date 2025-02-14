@@ -34,6 +34,9 @@ public class CreateUserSimulation extends Simulation {
     {
         setUp(
                 myFirstScenario.injectOpen(constantUsersPerSec(2).during(60))
+        ).assertions(
+                global().responseTime().percentile4().lt(500), // 99th Percentile response time must be less than 500ms
+                global().successfulRequests().percent().gt(95.0) // Must have a 95% success rate
         ).protocols(httpProtocol);
     }
 }
