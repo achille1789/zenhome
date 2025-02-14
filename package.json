@@ -6,7 +6,7 @@
     "build": "tsc",
     "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "vitest run --coverage --coverage.reporter=text",
-    "test:backend": "pip install -q -r requirements-dev.txt && coverage run -m pytest && coverage report -m"
+    "test:backend": "pip install -q -r backend/requirements-dev.txt && coverage run -m pytest && coverage report -m"
   },
   "repository": {
     "type": "git",
