@@ -1,7 +1,11 @@
 # ZenHome
-Smart home automation app
+Smart home automation app.
 
-## Useful Python Commands
+This repository contains the frontend and backend services for the ZenHome app, along with the pipeline configuration for CI/CD and the AWS CloudFormation template.<br>
+The backend is built with Python, while the frontend uses HTML, CSS, and TypeScript.
+
+
+## Useful Python Commands to work with the backend code
 
 ### Installing Requirements
 
@@ -30,7 +34,7 @@ To run unit tests, run the following command:
 coverage run -m pytest
 ```
 
-To See the coverage report, run the following command:
+To see the coverage report, run the following command:
 
 ```bash
 coverage report -m
@@ -42,3 +46,20 @@ coverage report -m
 First, start the app.
 
 Then either run the feature file directly, or right-click on the behave folder and click run.
+
+## Useful NPM Commands to work with the frontend code
+
+### Installing Dependencies
+
+To install the dependencies, run the following command:
+
+```bash
+npm install
+```
+This will install all the packages need to compile and test the TypeScript code.
+
+To run the unit tests and see the coverage report, run the following command:
+
+```bash
+npm run test:frontend
+```
