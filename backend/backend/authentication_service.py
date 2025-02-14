@@ -30,7 +30,8 @@ class AuthenticationService:
     def _user_exists(self, email: str) -> bool:
         return bool(self.user_manager_service.get_user(email))
 
-    def _hash_password(self, new_user: UserRequest) -> bytes:
+    @staticmethod
+    def _hash_password(new_user: UserRequest) -> bytes:
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(str.encode(new_user.password), salt)
 
