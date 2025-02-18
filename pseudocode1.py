@@ -30,15 +30,11 @@ import json
             def login(self):
                 if self.act == 'create':
                     # code below will be multiple If statements
-                    # first if: some code that perform email, password validation
                     if self.validate_email() and self.validate_password():
-                        # validation passed
-                        pass
-                        # second if: do a request to DB to check if a user with same email already exists
                         user = self.get_user()
                         if user:
-                            # user exists - error
-                            pass
+                            return "User already exists"
+
                         else:
                             # user doesn't exist
                             #   do a request to DB to create a new account and set a pwd in clear
@@ -49,11 +45,9 @@ import json
                                 return self.generate_token()
                             else:
                                 # some issue writing to DB
-                                #   return an error message
-                                pass
+                                   return "Couldn't create a new user."
                     else:
-                        # Raise some error
-                        pass
+                        return "Failed to validate login credentials."
 
                 if self.act == 'login':
                     # code below will be multiple If statements
@@ -103,6 +97,7 @@ import json
                     # code below will be multiple If statements
                     # first if: some code that perform email, password, newPassword validation
                     if self.validate.email() and self.validate.password() and self.validate.newPassword():
+                        pass
                     # second if: do a request to DB to check if email and pwd are correct
                     user = self.get_user()
                     if user:
@@ -115,19 +110,21 @@ import json
                     else:
                         # No such user, return error
                         pass
-                    else:
+                else:
                     # return an error message
                     pass
                 pass
                     # if the above checks are successful
                     #   do a request to DB to update the password #
+
                 def create_new_password():
                     if self.validate.newPassword():
-                    #   return a token and a success message
+                        #return a token and a success message
+                        pass
                     return self.generate_token()
-                    # else
-                    #   return an error message
-                    pass
+                    #else:
+                        #return an error message
+                        #pass
 
 
 
@@ -142,12 +139,11 @@ import json
                         user = self.get_user()
                         if user:
                             if self.compare_email(user['email']) and self.compare_password(user['password']):
-                                # second if: do a request to DB to check if email and pwd are correct
-                    # if the above check is successful
+                                pass
                     #   do a request to DB to delete account
                         # unsure how to delete in Python (cursor.execute?)
                     #   return a success message
-                     print("Password deleted successfully.")
+                    print("Password deleted successfully.")
                     # else
                     #   return an error message
                     pass
