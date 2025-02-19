@@ -2,7 +2,11 @@
 Smart home automation app.
 
 This repository contains the frontend and backend services for the ZenHome app, along with the pipeline configuration for CI/CD and the AWS CloudFormation template.<br>
-The backend is built with Python, while the frontend uses HTML, CSS, and TypeScript.
+The backend is built with Python, while the frontend uses HTML, CSS, and TypeScript.<br>
+The CI/CD pipeline is built with Concourse and the infrastructure is deployed on AWS using CloudFormation.<br>
+Environments:
+- Staging: [https://stage-zenhome-portal.s3.eu-west-2.amazonaws.com/index.html](https://stage-zenhome-portal.s3.eu-west-2.amazonaws.com/index.html)
+- Production: [https://prod-zenhome-portal.s3.eu-west-2.amazonaws.com/index.html](https://prod-zenhome-portal.s3.eu-west-2.amazonaws.com/index.html)
 
 
 ## Useful Python Commands to work with the backend code
@@ -22,7 +26,7 @@ Run the backend.backend.__init__.py file to start the app.
 
 ### Interacting with the API
 
-fastAPI automatically builds interactive OpenAPI documentation. To access it, [click here](http://localhost:8000/docs).
+fastAPI automatically builds interactive OpenAPI documentation. To access it when running on your local environment, [click here](http://localhost:8000/docs).
 
 ### Running Tests
 
